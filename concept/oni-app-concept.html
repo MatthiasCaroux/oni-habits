@@ -1,0 +1,622 @@
+<title>ONI Dojo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : une colonne éditoriale sur fond noir, sections séparées par un filet bordeaux, maquettes en rangée de téléphones. DA reprise du site oni-coaching.fr (thème sombre unique, assumé). */
+:root {
+  color-scheme: dark;
+  --bg: #0A0A0A;
+  --surface: #120A0A;
+  --surface-2: #1E090E;
+  --line: #38070E;
+  --line-strong: #560610;
+  --red: #EE001D;
+  --red-hot: #FF010A;
+  --fg: #F4F0F0;
+  --muted: #A99D9F;
+  --dim: #6F6466;
+  --ok: #5BD69A;
+  --warn: #F2B33D;
+  --display: "Montserrat", "Arial Black", system-ui, sans-serif;
+  --numeral: "Bebas Neue", "Oswald", "Impact", sans-serif;
+  --body: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: rgba(11,10,11,.94);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+}
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; }
+.logo { font-family: var(--display); font-weight: 900; font-style: italic; font-size: 26px; letter-spacing: -1px; line-height: 1; color: var(--fg); }
+.logo b { color: var(--red-hot); font-style: normal; }
+.nav { display: flex; gap: 22px; flex-wrap: wrap; }
+.nav a { color: var(--fg); text-decoration: none; font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.nav a:hover, .nav a:focus-visible { color: var(--red); outline: none; }
+@media (max-width: 760px) { .nav { display: none; } }
+
+/* Hero */
+.hero { padding-block: 72px 56px; border-bottom: 1px solid var(--line); }
+.hero .big { font-family: var(--display); font-weight: 900; font-style: italic; font-size: clamp(64px, 14vw, 150px); line-height: .9; letter-spacing: -4px; margin: 0; }
+.hero .big b { color: var(--red-hot); font-style: normal; }
+.hero .sub { font-family: var(--numeral); font-size: clamp(28px, 5vw, 46px); letter-spacing: .42em; margin: 8px 0 0; line-height: 1; }
+.hero .pitch { max-width: 640px; font-size: 18px; font-weight: 600; margin: 32px 0 0; text-wrap: balance; }
+.hero .note { max-width: 640px; color: var(--muted); margin: 14px 0 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip { border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--fg); font-size: 11px; font-weight: 700; padding: 5px 10px; text-transform: uppercase; letter-spacing: .06em; }
+
+/* Sections */
+section { padding-block: 64px; border-bottom: 1px solid var(--line); }
+h2 { font-family: var(--display); font-weight: 900; text-transform: uppercase; color: var(--red); font-size: clamp(30px, 5vw, 44px); line-height: 1.05; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 680px; margin: 10px 0 36px; }
+h3 { font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: 19px; line-height: 1.2; margin: 0; }
+.kicker { color: var(--red); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin: 4px 0 12px; }
+p { margin: 0; }
+
+/* Principes */
+.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.example a { color: var(--red); font-weight: 700; }
+.card { background: var(--surface); border: 1px solid var(--line-strong); padding: 24px; min-width: 0; }
+.card p { color: #D9D0D1; font-size: 14px; }
+
+/* Avant / après */
+.table-scroll { overflow-x: auto; border: 1px solid var(--line-strong); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 720px; }
+th { text-align: left; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 800; padding: 12px 16px; background: var(--surface-2); border-bottom: 1px solid var(--line-strong); }
+td { padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td code, .field code { font-family: var(--mono); font-size: 12.5px; color: var(--fg); background: #1A1012; padding: 1px 5px; white-space: nowrap; }
+.strike { color: var(--dim); text-decoration: line-through; }
+.tag-new { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .08em; color: var(--bg); background: var(--red); padding: 1px 6px; margin-right: 6px; vertical-align: 1px; }
+
+/* Modèle */
+.schema { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.entity { background: var(--surface); border: 1px solid var(--line-strong); min-width: 0; }
+.entity header { padding: 16px 18px 12px; border-bottom: 1px solid var(--line); }
+.entity header .role { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.entity ul { list-style: none; margin: 0; padding: 8px 0; }
+.field { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 7px 18px; font-size: 13px; }
+.field .t { font-family: var(--mono); font-size: 11.5px; color: var(--dim); text-align: right; }
+.field .why { grid-column: 1 / -1; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+.field.pk code { color: var(--red-hot); }
+.entity.core { border-color: var(--red); box-shadow: 0 0 0 1px rgba(238,0,29,.25), 0 0 28px rgba(238,0,29,.12); }
+
+/* Barème */
+.xp-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 860px) { .xp-layout { grid-template-columns: 1fr; } }
+.xp-list { border: 1px solid var(--line-strong); background: var(--surface); }
+.xp-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px; gap: 12px; padding: 13px 18px; border-bottom: 1px solid var(--line); align-items: baseline; }
+.xp-row:last-child { border-bottom: 0; }
+.xp-row .rule { font-weight: 700; font-size: 14px; }
+.xp-row .cond { display: block; color: var(--muted); font-weight: 400; font-size: 12.5px; margin-top: 2px; }
+.xp-row .pts { font-family: var(--numeral); font-size: 28px; color: var(--red); text-align: right; line-height: 1; font-variant-numeric: tabular-nums; }
+.xp-row.total { background: var(--surface-2); }
+.xp-row.total .pts { color: var(--fg); }
+.side-stack { display: grid; gap: 16px; }
+.ranks { display: grid; gap: 0; border: 1px solid var(--line-strong); background: var(--surface); }
+.rank { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--line); }
+.rank:last-child { border-bottom: 0; }
+.rank .n { font-family: var(--numeral); font-size: 24px; color: var(--dim); }
+.rank .name { font-weight: 800; text-transform: uppercase; font-size: 14px; letter-spacing: .03em; }
+.rank .name small { display: block; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--muted); font-size: 12px; }
+.rank .xp { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rank.top .name { color: var(--red-hot); }
+.callout { border-left: 3px solid var(--red); background: var(--surface-2); padding: 14px 18px; font-size: 14px; font-weight: 600; }
+.callout span { display: block; font-weight: 400; color: var(--muted); margin-top: 4px; font-size: 13px; }
+
+/* Téléphones */
+.phones { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; }
+.phone-col { display: grid; gap: 12px; justify-items: center; width: 300px; max-width: 100%; }
+.phone-cap { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.phone {
+  width: 300px; max-width: 100%;
+  background: #050505;
+  border: 1px solid #2A2A2A;
+  border-radius: 34px;
+  padding: 10px;
+  box-shadow: 0 30px 60px rgba(0,0,0,.6), 0 0 0 1px #000;
+}
+.screen { background: var(--bg); border-radius: 26px; overflow: hidden; min-height: 590px; display: flex; flex-direction: column; }
+.status { display: flex; justify-content: space-between; padding: 10px 20px 4px; font-size: 11px; font-weight: 700; color: var(--fg); }
+.app-head { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px 12px; border-bottom: 1px solid var(--line); }
+.app-head .logo { font-size: 20px; }
+.pill { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; border: 1px solid var(--line-strong); background: var(--surface-2); padding: 3px 8px; white-space: nowrap; }
+.pill.red { background: var(--red); border-color: var(--red); color: #fff; }
+.scr-body { padding: 14px 16px; display: grid; gap: 10px; flex: 1; align-content: start; }
+.daytitle { display: flex; justify-content: space-between; align-items: end; }
+.daytitle .d { font-family: var(--display); font-weight: 900; text-transform: uppercase; font-size: 18px; line-height: 1; }
+.daytitle .d small { display: block; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .08em; margin-bottom: 4px; }
+.xpbar { background: var(--surface); border: 1px solid var(--line-strong); padding: 12px; }
+.xpbar .row { display: flex; justify-content: space-between; align-items: baseline; }
+.xpbar .val { font-family: var(--numeral); font-size: 40px; line-height: 1; }
+.xpbar .val span { color: var(--muted); font-size: 22px; }
+.xpbar .lvl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--red); text-align: right; }
+.bar { height: 6px; background: #241216; margin-top: 8px; }
+.bar i { display: block; height: 100%; background: var(--red); box-shadow: 0 0 12px rgba(238,0,29,.6); }
+.item { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--line); padding: 9px 10px; }
+.item .ic { width: 22px; height: 22px; display: grid; place-items: center; font-size: 12px; font-weight: 900; border: 1px solid var(--line-strong); color: var(--dim); }
+.item.done .ic { background: var(--red); border-color: var(--red); color: #fff; }
+.item .lbl { font-size: 12px; font-weight: 700; line-height: 1.25; min-width: 0; }
+.item .lbl small { display: block; color: var(--muted); font-weight: 500; font-size: 10.5px; }
+.item .x { font-family: var(--numeral); font-size: 18px; color: var(--red); }
+.item:not(.done) .x { color: var(--dim); }
+.btn { display: block; text-align: center; background: var(--red); color: #fff; font-weight: 800; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; padding: 13px; box-shadow: 0 0 22px rgba(238,0,29,.45); margin-top: 4px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line-strong); }
+.tabs span { text-align: center; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 8px 4px; color: var(--muted); }
+.tabs span.on { background: var(--red); color: #fff; }
+.lb { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 10px; background: var(--surface); border: 1px solid var(--line); }
+.lb .pos { font-family: var(--numeral); font-size: 22px; color: var(--muted); line-height: 1; }
+.lb .who { font-size: 12.5px; font-weight: 800; min-width: 0; }
+.lb .who small { display: block; color: var(--muted); font-size: 10.5px; font-weight: 500; }
+.lb .score { text-align: right; font-family: var(--numeral); font-size: 20px; line-height: 1; font-variant-numeric: tabular-nums; }
+.lb .score small { display: block; font-family: var(--body); font-size: 9.5px; font-weight: 700; color: var(--muted); }
+.lb.first { border-color: var(--red); }
+.lb.first .pos { color: var(--red-hot); }
+.lb.me { background: var(--surface-2); border-color: var(--line-strong); }
+.up { color: var(--ok); } .down { color: var(--red); }
+.sep { text-align: center; color: var(--dim); font-size: 12px; line-height: 1; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stat { background: var(--surface); border: 1px solid var(--line-strong); padding: 10px; }
+.stat b { display: block; font-family: var(--numeral); font-size: 30px; line-height: 1; font-weight: 400; }
+.stat span { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.alert { display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 10px; background: var(--surface); border: 1px solid var(--line); padding: 9px 10px 9px 0; }
+.alert i { background: var(--red); }
+.alert.w i { background: var(--warn); }
+.alert .a { font-size: 12px; font-weight: 700; line-height: 1.3; min-width: 0; }
+.alert .a small { display: block; color: var(--muted); font-weight: 500; font-size: 10.5px; margin-top: 2px; }
+.mini-h { font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-top: 4px; }
+.example { color: var(--dim); font-size: 12px; text-align: center; margin-top: 18px; }
+
+/* Roadmap */
+.road { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.road .card ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 8px; }
+.road .card li { position: relative; padding-left: 20px; font-size: 13.5px; color: #D9D0D1; }
+.road .card li::before { content: "✓"; position: absolute; left: 0; color: var(--red); font-weight: 800; }
+.road .card.v1 { border-color: var(--red); }
+
+/* Questions */
+.qs { display: grid; gap: 0; border: 1px solid var(--line-strong); counter-reset: q; }
+.q { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); background: var(--surface); }
+.q:last-child { border-bottom: 0; }
+.q::before { counter-increment: q; content: counter(q, decimal-leading-zero); font-family: var(--numeral); font-size: 26px; color: var(--red); line-height: 1; }
+.q b { display: block; font-size: 14.5px; }
+.q span { color: var(--muted); font-size: 13px; }
+
+footer { padding-block: 40px 56px; color: var(--dim); font-size: 12px; }
+footer .logo { font-size: 20px; color: var(--dim); }
+footer .logo b { color: var(--red); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .bar i { animation: fill 1.2s ease-out both; transform-origin: left; }
+  @keyframes fill { from { transform: scaleX(.15); } to { transform: scaleX(1); } }
+}
+</style>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="logo">ONI<b>.</b></div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#principes">Principes</a>
+      <a href="#modele">Modèle</a>
+      <a href="#xp">XP &amp; rangs</a>
+      <a href="#ecrans">Écrans</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#questions">Pour Pierre</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="big">ONI<b>.</b></p>
+    <p class="sub">DOJO</p>
+    <p class="pitch">L'app de suivi quotidien des athlètes ONI&nbsp;: une routine de base (jour, semaine, mois) à laquelle chacun ajoute ses propres habitudes. Chaque case cochée rapporte de l'XP pour voir sa progression. Pas de classement&nbsp;: on voit ce que font les autres, on les encourage, on ne se compare pas.</p>
+    <p class="note">Ta base (une ligne par athlète et par jour) est la bonne. Cette version la rend plus saine, plus motivante au quotidien, et plus proche de ce que vivent ses athlètes&nbsp;: catégories de poids, compétitions, jours de repos. Pas d'espace coach&nbsp;: l'app sert à motiver les athlètes, Pierre reçoit seulement leur bilan de la semaine. «&nbsp;Dojo&nbsp;» est un nom de travail.</p>
+    <div class="chips">
+      <span class="chip">Force athlétique</span>
+      <span class="chip">Développé couché</span>
+      <span class="chip">Street lifting</span>
+      <span class="chip">Coaching entreprise</span>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="principes">
+  <div class="wrap">
+    <h2>Cinq règles du jeu</h2>
+    <p class="lede">Elles guident tout le reste du modèle. Si Pierre n'est pas d'accord avec l'une d'elles, c'est là qu'il faut trancher en premier.</p>
+    <div class="principles">
+      <div class="card">
+        <h3>On se compare à soi-même</h3>
+        <p class="kicker">Pas de classement</p>
+        <p>L'XP récompense l'atteinte de <em>ses propres</em> objectifs et sert à voir sa progression. Les autres sont visibles dans le Dojo, pour s'encourager, jamais pour se classer. Pierre veut un outil sain, pas une compétition de plus.</p>
+      </div>
+      <div class="card">
+        <h3>Le repos compte comme une séance</h3>
+        <p class="kicker">Pas de surentraînement</p>
+        <p>Un jour sans séance ne casse pas la série. Les séances au-delà du nombre annoncé pour la semaine ne rapportent rien&nbsp;: l'app ne doit jamais pousser à en faire plus que le plan.</p>
+      </div>
+      <div class="card">
+        <h3>Chaque point d'XP a une raison</h3>
+        <p class="kicker">Journal d'XP</p>
+        <p>L'XP n'est pas un total figé dans la journée mais une suite de lignes («&nbsp;+10 eau 2&nbsp;L&nbsp;»). On peut corriger, recalculer après un changement de barème et expliquer un score.</p>
+      </div>
+      <div class="card">
+        <h3>Le poids reste privé</h3>
+        <p class="kicker">Confidentialité</p>
+        <p>Le Dojo n'affiche qu'un pseudo et les moments que l'athlète choisit de partager (semaine complète, série, nouveau rang). Poids, calories, douleurs et rehab restent privés&nbsp;; Pierre ne les voit que dans le bilan hebdo.</p>
+      </div>
+      <div class="card">
+        <h3>Trois rythmes&nbsp;: le jour, la semaine, le mois</h3>
+        <p class="kicker">Quotidien · hebdo · mensuel</p>
+        <p>Chaque jour&nbsp;: souplesse du matin, pas, calories, 2&nbsp;L d'eau, forme et une case pour la séance. Chaque semaine&nbsp;: le nombre de séances, la pesée, les vidéos, le bilan pour Pierre et, si besoin, le retour rehab. Chaque mois&nbsp;: payer le coach.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="avant-apres">
+  <div class="wrap">
+    <h2>Ce qui change dans ta table</h2>
+    <p class="lede">Champ par champ, ce que je garde, ce que je déplace et pourquoi.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:24%">Ton champ</th><th style="width:30%">Devient</th><th>Pourquoi</th></tr></thead>
+        <tbody>
+          <tr><td><code>user_id / date</code></td><td><code>athlete_id + local_date</code></td><td>La date est celle du fuseau de l'athlète, sinon un athlète en Guadeloupe ou en voyage valide « demain ». La journée se verrouille à J+1 midi.</td></tr>
+          <tr><td><code>steps_target</code></td><td><code>target_id</code> → table <code>targets</code></td><td>Tous les objectifs (pas, kcal, eau, phase) sont rangés ensemble avec une date d'effet. Quand l'athlète met à jour ses objectifs (ceux que Pierre lui donne), une nouvelle version est créée et l'historique ne bouge pas. Plus besoin de recopier chaque objectif dans chaque ligne.</td></tr>
+          <tr><td><code>steps_source</code></td><td><code>IOS_SHORTCUT</code> · <code>HEALTH_CONNECT</code> · <code>MANUAL</code> + <code>steps_synced_at</code></td><td>Les athlètes sur Android n'ont pas de Raccourcis. La saisie manuelle reste possible, marquée «&nbsp;manuel&nbsp;» et plafonnée à l'objectif.</td></tr>
+          <tr><td><code>calories_actual / target</code></td><td><code>kcal</code> + fourchette <code>kcal_min / kcal_max</code></td><td>Personne ne tombe pile sur 2&nbsp;300&nbsp;kcal. Une fourchette donnée par Pierre est atteignable et dépend de la phase (sèche, prise, prépa compét).</td></tr>
+          <tr><td class="strike">protein_actual / target</td><td>retiré</td><td>Trop contraignant à compter chaque jour pour ce que ça rapporte en motivation. L'eau prend sa place.</td></tr>
+          <tr><td class="strike">absent</td><td><span class="tag-new">NOUVEAU</span><code>water_l</code></td><td>Objectif 2&nbsp;L par jour, saisi en un geste (verre 0,25&nbsp;L, gourde 0,5&nbsp;L).</td></tr>
+          <tr><td class="strike">absent</td><td><span class="tag-new">NOUVEAU</span><code>mobility_done</code></td><td>Une case «&nbsp;souplesse du matin&nbsp;»&nbsp;: quelques minutes de mobilité au réveil, pour prévenir les douleurs.</td></tr>
+          <tr><td><code>workout_completed</code></td><td><code>session_done</code> (une case) + <code>sessions_planned</code> par semaine</td><td>L'athlète indique combien de séances il fait cette semaine (une valeur par défaut est dans ses objectifs), puis coche une case par séance faite. Pas de détail de séance dans l'app. Les jours de repos ne cassent pas la série.</td></tr>
+          <tr><td><code>workout_rpe / notes</code></td><td>bilan hebdo&nbsp;: table <code>weekly_reviews</code></td><td>Le détail de l'entraînement reste dans le Google Sheets de Pierre. Le ressenti passe dans le bilan de la semaine&nbsp;: une note sur 10, ce qui a été dur et un message pour Pierre.</td></tr>
+          <tr><td><code>xp_earned</code></td><td>table <code>xp_events</code> (somme = XP du jour)</td><td>Voir la règle « Chaque point d'XP a une raison ». Le total du jour peut rester en cache dans la ligne pour l'affichage.</td></tr>
+          <tr><td class="strike">absent</td><td><span class="tag-new">NOUVEAU</span><code>bodyweight_kg</code> dans le bilan hebdo</td><td>Une pesée par semaine, à jeun au réveil&nbsp;: assez pour suivre la catégorie de poids et la trajectoire avant compétition, sans obséder sur la balance. Courbe visible dans le profil, jamais partagée.</td></tr>
+          <tr><td class="strike">absent</td><td><span class="tag-new">NOUVEAU</span>table <code>habits</code></td><td>La routine de base est la même pour tous&nbsp;; chaque athlète peut y ajouter jusqu'à 5 habitudes perso (nom + rythme jour, semaine ou mois), à 5&nbsp;XP la case.</td></tr>
+          <tr><td class="strike">absent</td><td><span class="tag-new">NOUVEAU</span>table <code>feed_events</code></td><td>Le Dojo&nbsp;: un fil des moments partagés par les athlètes et un bouton «&nbsp;Respect&nbsp;». Remplace le classement.</td></tr>
+          <tr><td class="strike">absent</td><td><span class="tag-new">NOUVEAU</span><code>sleep_h</code>, <code>fatigue</code>, <code>pain_zone</code></td><td>Check-in forme en 10 secondes. Une douleur signalée est reprise dans le bilan hebdo envoyé à Pierre (le pilier « prévention des douleurs » des formules).</td></tr>
+          <tr><td class="strike">absent</td><td><span class="tag-new">NOUVEAU</span><code>video_sent</code> dans le bilan hebdo</td><td>Une simple case «&nbsp;vidéos envoyées à Pierre&nbsp;». Les vidéos passent par le canal habituel (WhatsApp), l'app ne stocke aucun fichier.</td></tr>
+          <tr><td class="strike">absent</td><td><span class="tag-new">NOUVEAU</span><code>rehab_done</code> dans le bilan hebdo</td><td>Une case optionnelle et sans XP&nbsp;: rehab faite cette semaine (kiné, ostéo, exercices).</td></tr>
+          <tr><td class="strike">absent</td><td><span class="tag-new">NOUVEAU</span>table <code>monthly_checks</code></td><td>Une case par mois&nbsp;: payer le coach. Simple rappel, sans XP, notification le 25 si la case n'est pas cochée.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="modele">
+  <div class="wrap">
+    <h2>Le modèle de données</h2>
+    <p class="lede">Neuf tables. Le journal du jour et le bilan de la semaine sont les deux centres, le mois tient en une case, le reste gravite autour. Types donnés pour PostgreSQL.</p>
+    <div class="schema">
+
+      <article class="entity core">
+        <header><h3>daily_logs</h3><p class="role">Une ligne par athlète et par jour. Ta table d'origine, renforcée.</p></header>
+        <ul>
+          <li class="field pk"><code>athlete_id + local_date</code><span class="t">uuid · date</span><span class="why">Clé primaire composée.</span></li>
+          <li class="field"><code>target_id</code><span class="t">uuid</span><span class="why">Version d'objectifs en vigueur ce jour-là.</span></li>
+          <li class="field"><code>steps</code> · <code>steps_source</code> · <code>steps_synced_at</code><span class="t">int · enum · ts</span></li>
+          <li class="field"><code>mobility_done</code><span class="t">bool</span><span class="why">Souplesse du matin.</span></li>
+          <li class="field"><code>kcal</code> · <code>water_l</code><span class="t">int · numeric(3,2)</span></li>
+          <li class="field"><code>session_done</code><span class="t">bool</span><span class="why">La case «&nbsp;séance faite&nbsp;». Le total de la semaine se compare à <code>sessions_planned</code>.</span></li>
+          <li class="field"><code>sleep_h</code> · <code>fatigue</code> · <code>pain_zone</code><span class="t">numeric · 1–5 · text</span></li>
+          <li class="field"><code>notes</code><span class="t">text</span></li>
+          <li class="field"><code>xp_total</code> · <code>locked_at</code><span class="t">int · ts</span><span class="why">Cache d'affichage et verrou à J+1 midi.</span></li>
+        </ul>
+      </article>
+
+      <article class="entity">
+        <header><h3>athletes</h3><p class="role">Le profil de l'athlète.</p></header>
+        <ul>
+          <li class="field pk"><code>id</code><span class="t">uuid</span></li>
+          <li class="field"><code>first_name</code> · <code>alias</code><span class="t">text</span><span class="why">Le pseudo affiché dans le Dojo.</span></li>
+          <li class="field"><code>discipline</code><span class="t">enum</span><span class="why"><code>FORCE_ATHLETIQUE</code> · <code>DEVELOPPE_COUCHE</code> · <code>STREET_LIFTING</code> · <code>FORME</code></span></li>
+          <li class="field"><code>plan</code><span class="t">enum</span><span class="why"><code>DISTANCIEL_QUOTIDIEN</code> · <code>DISTANCIEL_HEBDO</code> · <code>PARTICULIER</code> · <code>ENTREPRISE</code></span></li>
+          <li class="field"><code>timezone</code><span class="t">text</span></li>
+          <li class="field"><code>share_in_dojo</code><span class="t">bool</span><span class="why">Visible dans le fil ou non.</span></li>
+          <li class="field"><code>steps_token_hash</code><span class="t">text</span><span class="why">Jeton perso du Raccourci iPhone, révocable.</span></li>
+        </ul>
+      </article>
+
+      <article class="entity">
+        <header><h3>targets</h3><p class="role">Objectifs historisés, saisis par l'athlète d'après ce que Pierre lui donne. Chaque changement crée une version.</p></header>
+        <ul>
+          <li class="field pk"><code>id</code><span class="t">uuid</span></li>
+          <li class="field"><code>athlete_id</code> · <code>valid_from</code><span class="t">uuid · date</span></li>
+          <li class="field"><code>phase</code><span class="t">enum</span><span class="why"><code>SECHE</code> · <code>MAINTIEN</code> · <code>PRISE</code> · <code>PREPA_COMPET</code></span></li>
+          <li class="field"><code>sessions_per_week</code><span class="t">int</span><span class="why">Valeur proposée chaque lundi, modifiable pour la semaine.</span></li>
+          <li class="field"><code>steps_target</code><span class="t">int</span></li>
+          <li class="field"><code>kcal_min</code> · <code>kcal_max</code><span class="t">int</span></li>
+          <li class="field"><code>water_target_l</code><span class="t">numeric</span><span class="why">2&nbsp;L par défaut.</span></li>
+          <li class="field"><code>bodyweight_goal_kg</code><span class="t">numeric · null</span></li>
+        </ul>
+      </article>
+
+      <article class="entity core">
+        <header><h3>weekly_reviews</h3><p class="role">Une ligne par athlète et par semaine&nbsp;: séances, pesée, vidéos et bilan pour Pierre.</p></header>
+        <ul>
+          <li class="field pk"><code>athlete_id + week_start</code><span class="t">uuid · date</span><span class="why">Le lundi de la semaine.</span></li>
+          <li class="field"><code>sessions_planned</code><span class="t">int</span><span class="why">«&nbsp;Combien de séances cette semaine&nbsp;?&nbsp;» Pré-rempli depuis les objectifs.</span></li>
+          <li class="field"><code>sessions_done</code><span class="t">calculé</span><span class="why">Somme des <code>session_done</code> de la semaine.</span></li>
+          <li class="field"><code>rating</code> · <code>hard_points</code><span class="t">1–10 · text[]</span><span class="why">Note de la semaine, ce qui a été dur.</span></li>
+          <li class="field"><code>message</code><span class="t">text</span><span class="why">Le mot pour Pierre.</span></li>
+          <li class="field"><code>bodyweight_kg</code> · <code>weighed_at</code><span class="t">numeric(5,2) · ts</span><span class="why">La pesée de la semaine, à jeun.</span></li>
+          <li class="field"><code>video_sent</code><span class="t">bool</span><span class="why">Case cochée, aucune vidéo stockée.</span></li>
+          <li class="field"><code>rehab_done</code><span class="t">bool</span><span class="why">Case optionnelle.</span></li>
+          <li class="field"><code>sent_at</code><span class="t">ts</span><span class="why">Envoi à Pierre par email ou WhatsApp, avant dimanche 20h.</span></li>
+        </ul>
+      </article>
+
+      <article class="entity">
+        <header><h3>monthly_checks</h3><p class="role">Une ligne par athlète et par mois. Rien d'autre que le paiement du coach.</p></header>
+        <ul>
+          <li class="field pk"><code>athlete_id + month</code><span class="t">uuid · date</span><span class="why">Le 1er du mois.</span></li>
+          <li class="field"><code>coach_paid</code> · <code>paid_at</code><span class="t">bool · ts</span><span class="why">Cochée par l'athlète, sans XP.</span></li>
+          <li class="field"><code>reminder_sent_at</code><span class="t">ts · null</span><span class="why">Notification le 25 si la case est vide.</span></li>
+        </ul>
+      </article>
+      <article class="entity">
+        <header><h3>xp_events</h3><p class="role">Le journal d'XP. Le rang et les graphiques du profil sont des sommes sur cette table.</p></header>
+        <ul>
+          <li class="field pk"><code>id</code><span class="t">uuid</span></li>
+          <li class="field"><code>athlete_id</code> · <code>local_date</code><span class="t">uuid · date</span></li>
+          <li class="field"><code>rule</code><span class="t">enum</span><span class="why"><code>MOBILITY</code> · <code>STEPS</code> · <code>KCAL</code> · <code>WATER</code> · <code>SESSION</code> · <code>REST</code> · <code>CHECKIN</code> · <code>FULL_DAY</code> · <code>WEEKLY_REVIEW</code> · <code>ALL_SESSIONS</code> · <code>WEIGH_IN</code> · <code>VIDEO</code> · <code>HABIT</code> · <code>STREAK</code> · <code>CORRECTION</code></span></li>
+          <li class="field"><code>xp</code><span class="t">int</span><span class="why">Peut être négatif pour une correction.</span></li>
+          <li class="field"><code>rule_version</code><span class="t">int</span><span class="why">Barème utilisé, pour recalculer proprement.</span></li>
+        </ul>
+      </article>
+
+      <article class="entity">
+        <header><h3>competitions</h3><p class="role">Les échéances qui donnent du sens à la saison.</p></header>
+        <ul>
+          <li class="field pk"><code>id</code><span class="t">uuid</span></li>
+          <li class="field"><code>athlete_id</code> · <code>name</code> · <code>date</code><span class="t">uuid · text · date</span><span class="why">Ex. Championnat de France de Développé Couché.</span></li>
+          <li class="field"><code>weight_class_kg</code><span class="t">numeric</span><span class="why">Compte à rebours et rappel de catégorie sur l'écran du jour.</span></li>
+          <li class="field"><code>goal_total_kg</code><span class="t">numeric · null</span></li>
+        </ul>
+      </article>
+
+      <article class="entity">
+        <header><h3>habits</h3><p class="role">Les habitudes perso, ajoutées à la routine de base.</p></header>
+        <ul>
+          <li class="field pk"><code>id</code><span class="t">uuid</span></li>
+          <li class="field"><code>athlete_id</code> · <code>name</code><span class="t">uuid · text</span><span class="why">Ex. «&nbsp;Lire 10 pages&nbsp;». 5 maximum par athlète.</span></li>
+          <li class="field"><code>rhythm</code><span class="t">enum</span><span class="why"><code>DAILY</code> · <code>WEEKLY</code> · <code>MONTHLY</code></span></li>
+          <li class="field"><code>archived_at</code><span class="t">ts · null</span><span class="why">Supprimer garde l'historique.</span></li>
+          <li class="field"><code>habit_checks</code><span class="t">table liée</span><span class="why">Une ligne par case cochée&nbsp;: <code>habit_id</code> · <code>period_start</code>.</span></li>
+        </ul>
+      </article>
+
+      <article class="entity">
+        <header><h3>feed_events</h3><p class="role">Le fil du Dojo, à la place du classement.</p></header>
+        <ul>
+          <li class="field pk"><code>id</code><span class="t">uuid</span></li>
+          <li class="field"><code>athlete_id</code> · <code>created_at</code><span class="t">uuid · ts</span></li>
+          <li class="field"><code>kind</code><span class="t">enum</span><span class="why"><code>WEEK_COMPLETE</code> · <code>STREAK</code> · <code>NEW_RANK</code> · <code>NEW_HABIT</code> · <code>COMEBACK</code></span></li>
+          <li class="field"><code>respects</code><span class="t">table liée</span><span class="why">Qui a encouragé qui. Aucun score, aucun chiffre de poids ou de calories.</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="xp">
+  <div class="wrap">
+    <h2>XP, séries et rangs</h2>
+    <p class="lede">Un barème de départ à valider avec Pierre. Une journée parfaite vaut 120&nbsp;XP, la semaine ajoute jusqu'à 110&nbsp;XP, le mois ne rapporte rien. Tout est relatif aux objectifs de chaque athlète.</p>
+    <div class="xp-layout">
+      <div class="xp-list" role="table" aria-label="Barème d'XP quotidien">
+        <div class="xp-row"><span class="rule">Souplesse du matin<span class="cond">Quelques minutes de mobilité au réveil.</span></span><span class="pts">10</span></div>
+        <div class="xp-row"><span class="rule">Pas, par tranche de 1&nbsp;000<span class="cond">Chaque tranche rapporte sa part des 20&nbsp;XP&nbsp;: 2&nbsp;XP par tranche pour un objectif de 10&nbsp;000 (7&nbsp;300 pas = 14&nbsp;XP), environ 3 pour un objectif de 6&nbsp;000. Plafonné à l'objectif.</span></span><span class="pts">20</span></div>
+        <div class="xp-row"><span class="rule">Calories<span class="cond">Dans la fourchette kcal_min – kcal_max de la phase.</span></span><span class="pts">20</span></div>
+        <div class="xp-row"><span class="rule">Eau<span class="cond">Au moins 2&nbsp;L dans la journée.</span></span><span class="pts">10</span></div>
+        <div class="xp-row"><span class="rule">Séance cochée<span class="cond">Une case par séance, dans la limite du nombre annoncé pour la semaine.</span></span><span class="pts">40</span></div>
+        <div class="xp-row"><span class="rule">Ou repos respecté<span class="cond">Jour sans séance, check-in forme fait. Remplace la ligne séance.</span></span><span class="pts">40</span></div>
+        <div class="xp-row"><span class="rule">Check-in forme<span class="cond">Sommeil, fatigue, douleur éventuelle.</span></span><span class="pts">10</span></div>
+        <div class="xp-row"><span class="rule">Journée complète<span class="cond">Toutes les lignes ci-dessus validées.</span></span><span class="pts">10</span></div>
+        <div class="xp-row total"><span class="rule">Maximum par jour</span><span class="pts">120</span></div>
+        <div class="xp-row"><span class="rule">Bilan hebdo envoyé<span class="cond">Note, ce qui a été dur, message pour Pierre. Avant dimanche 20h.</span></span><span class="pts">50</span></div>
+        <div class="xp-row"><span class="rule">Toutes les séances de la semaine<span class="cond">Cases cochées = nombre de séances annoncé.</span></span><span class="pts">30</span></div>
+        <div class="xp-row"><span class="rule">Retours vidéo<span class="cond">Case cochée&nbsp;: vidéos envoyées à Pierre cette semaine.</span></span><span class="pts">20</span></div>
+        <div class="xp-row"><span class="rule">Pesée de la semaine<span class="cond">Une fois, à jeun au réveil.</span></span><span class="pts">10</span></div>
+        <div class="xp-row"><span class="rule">Retour rehab<span class="cond">Optionnel, donc sans XP pour ne pénaliser personne.</span></span><span class="pts">0</span></div>
+        <div class="xp-row total"><span class="rule">Bonus maximum par semaine</span><span class="pts">110</span></div>
+        <div class="xp-row"><span class="rule">Payer le coach<span class="cond">Une case par mois, simple rappel.</span></span><span class="pts">0</span></div>
+        <div class="xp-row"><span class="rule">Habitude perso cochée<span class="cond">Jusqu'à 5 habitudes créées par l'athlète, en plus du maximum de base.</span></span><span class="pts">5</span></div>
+        <div class="xp-row"><span class="rule">Série<span class="cond">7 jours complets d'affilée&nbsp;: +10 % · 30 jours&nbsp;: +25 %. Un joker par semaine pour un jour raté.</span></span><span class="pts">×1,25</span></div>
+      </div>
+
+      <div class="side-stack">
+        <div class="ranks" aria-label="Rangs par XP cumulée">
+          <div class="rank"><span class="n">1</span><span class="name">Kōhai<small>Dès l'inscription</small></span><span class="xp">0 XP</span></div>
+          <div class="rank"><span class="n">2</span><span class="name">Senpai<small>≈ 2 à 3 semaines régulières</small></span><span class="xp">1 500</span></div>
+          <div class="rank"><span class="n">3</span><span class="name">Samouraï<small>≈ 2 mois</small></span><span class="xp">5 000</span></div>
+          <div class="rank"><span class="n">4</span><span class="name">Shōgun<small>≈ 4 mois</small></span><span class="xp">12 000</span></div>
+          <div class="rank top"><span class="n">5</span><span class="name">Oni<small>≈ 8 mois sans lâcher</small></span><span class="xp">25 000</span></div>
+        </div>
+        <div class="callout">Pas de classement, un Dojo.
+          <span>Le rang est personnel&nbsp;: il se cumule et ne redescend jamais. Pour voir ce que font les autres, le Dojo montre un fil des moments partagés (semaine complète, série, retour de blessure) et un objectif commun de séances, sans score ni position.</span>
+        </div>
+        <div class="callout">Les rangs suivent le nom de la marque.
+          <span>Un oni est un démon japonais. Les paliers vont de l'apprenti au démon, ce qui colle au logo et donne envie d'atteindre le dernier.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ecrans">
+  <div class="wrap">
+    <h2>Trois écrans clés</h2>
+    <p class="lede">Même noir, même rouge, mêmes capitales grasses que le site. Les cartes reprennent les bordures bordeaux des formules, les boutons gardent le halo rouge.</p>
+    <div class="phones">
+
+      <div class="phone-col">
+        <div class="phone" aria-label="Maquette écran Aujourd'hui">
+          <div class="screen">
+            <div class="status"><span>21:42</span><span>5G ▮▮▮</span></div>
+            <div class="app-head"><span class="logo">ONI<b>.</b></span><span class="pill red">Série 12 j</span></div>
+            <div class="scr-body">
+              <div class="daytitle"><div class="d"><small>Jeudi 12 nov.</small>Aujourd'hui</div><span class="pill">Prépa compét</span></div>
+              <div class="xpbar">
+                <div class="row"><div class="val">94<span> / 120 XP</span></div><div class="lvl">Samouraï<br><span style="color:var(--muted)">6 840 XP</span></div></div>
+                <div class="bar"><i style="width:78%"></i></div>
+              </div>
+              <div class="item done"><span class="ic">✓</span><span class="lbl">Souplesse du matin<small>Faite à 7:20 · 10 min</small></span><span class="x">+10</span></div>
+              <div class="item done"><span class="ic">7</span><span class="lbl">Pas · 7 300 / 10 000<small>+2 XP tous les 1 000 pas · encore 2 700</small></span><span class="x">+14</span></div>
+              <div class="item done"><span class="ic">✓</span><span class="lbl">Calories · 2 310 kcal<small>Fourchette 2 200 – 2 400</small></span><span class="x">+20</span></div>
+              <div class="item"><span class="ic">!</span><span class="lbl">Eau · 1,5 / 2 L<small>Encore 0,5 L pour valider</small></span><span class="x">0</span></div>
+              <div class="item done"><span class="ic">✓</span><span class="lbl">Séance du jour<small>Cochée · 3e sur 4 cette semaine</small></span><span class="x">+40</span></div>
+              <div class="item done"><span class="ic">✓</span><span class="lbl">Forme · 7 h · fatigue 2/5<small>Aucune douleur</small></span><span class="x">+10</span></div>
+              <span class="btn">Valider ma journée</span>
+            </div>
+          </div>
+        </div>
+        <span class="phone-cap">Athlète · Aujourd'hui</span>
+      </div>
+
+      <div class="phone-col">
+        <div class="phone" aria-label="Maquette écran Le dojo">
+          <div class="screen">
+            <div class="status"><span>21:43</span><span>5G ▮▮▮</span></div>
+            <div class="app-head"><span class="logo">ONI<b>.</b></span><span class="pill">Sem. 46</span></div>
+            <div class="scr-body">
+              <div class="daytitle"><div class="d"><small>Ce que font les autres</small>Le dojo</div></div>
+              <div class="xpbar">
+                <div class="row"><div class="val">86<span> / 100 séances</span></div><div class="lvl">Ensemble<br><span style="color:var(--muted)">24 athlètes</span></div></div>
+                <div class="bar"><i style="width:86%"></i></div>
+              </div>
+              <p class="mini-h">Le fil</p>
+              <div class="item"><span class="ic">IL</span><span class="lbl">IronLéa<small>5 séances sur 5 cette semaine</small></span><span class="x">9</span></div>
+              <div class="item done"><span class="ic">K8</span><span class="lbl">Kev_83<small>7 jours de souplesse d'affilée</small></span><span class="x">6</span></div>
+              <div class="item"><span class="ic">YS</span><span class="lbl">Yanis_SL<small>Nouvelle habitude&nbsp;: marche après le repas</small></span><span class="x">3</span></div>
+              <div class="item"><span class="ic">SD</span><span class="lbl">Sarah.dl<small>Est passée Senpai</small></span><span class="x">12</span></div>
+              <div class="item"><span class="ic">AB</span><span class="lbl">Antoine.B<small>Première séance depuis sa blessure</small></span><span class="x">17</span></div>
+              <p class="mini-h">Ni score, ni poids&nbsp;: des «&nbsp;Respect&nbsp;»</p>
+            </div>
+          </div>
+        </div>
+        <span class="phone-cap">Athlète · Le dojo</span>
+      </div>
+
+      <div class="phone-col">
+        <div class="phone" aria-label="Maquette écran Ma semaine">
+          <div class="screen">
+            <div class="status"><span>21:44</span><span>5G ▮▮▮</span></div>
+            <div class="app-head"><span class="logo">ONI<b>.</b></span><span class="pill">Sem. 46</span></div>
+            <div class="scr-body">
+              <div class="daytitle"><div class="d"><small>9 – 15 nov.</small>Ma semaine</div><span class="pill red">Bilan dim.</span></div>
+              <p class="mini-h">Séances cette semaine&nbsp;: 4</p>
+              <div class="item done"><span class="ic">✓</span><span class="lbl">Séance 1<small>Cochée lun. 9</small></span><span class="x"></span></div>
+              <div class="item done"><span class="ic">✓</span><span class="lbl">Séance 2<small>Cochée mar. 10</small></span><span class="x"></span></div>
+              <div class="item done"><span class="ic">✓</span><span class="lbl">Séance 3<small>Cochée aujourd'hui</small></span><span class="x"></span></div>
+              <div class="item"><span class="ic"></span><span class="lbl">Séance 4<small>Les 4 cochées&nbsp;: bonus semaine</small></span><span class="x">+30</span></div>
+              <div class="item done"><span class="ic">✓</span><span class="lbl">Pesée · 82,4 kg<small>-0,5 kg vs sem. 45</small></span><span class="x">+10</span></div>
+              <div class="item done"><span class="ic">▶</span><span class="lbl">Retours vidéo<small>Envoyées à Pierre</small></span><span class="x">+20</span></div>
+              <div class="item"><span class="ic">7</span><span class="lbl">Bilan pour Pierre&nbsp;: 7/10<small>Dur&nbsp;: sommeil · message écrit</small></span><span class="x">+50</span></div>
+              <div class="item"><span class="ic">+</span><span class="lbl">Retour rehab<small>Optionnel · à cocher si faite</small></span><span class="x">0</span></div>
+              <span class="btn">Envoyer mon bilan à Pierre</span>
+            </div>
+          </div>
+        </div>
+        <span class="phone-cap">Athlète · Ma semaine</span>
+      </div>
+
+    </div>
+    <p class="example">Pseudos et chiffres inventés pour l'exemple.</p>
+    <p class="example"><a href="https://claude.ai/artifact/2e65EJBavAYusT2WQaSYjw">Voir les 7 écrans cliquables (jour, saisie, semaine, mois, habitudes, dojo, profil) sur le canvas Claude Design →</a></p>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="wrap">
+    <h2>Par où commencer</h2>
+    <p class="lede">Même stack que le site (Next.js) en application web installable sur l'écran d'accueil. Les données dans Supabase&nbsp;: PostgreSQL, connexion par lien email ou Google, droits par athlète, offre gratuite suffisante pour 40 athlètes.</p>
+    <div class="road">
+      <div class="card v1">
+        <h3>V1 · L'essentiel</h3>
+        <p class="kicker">Ce qui fait vivre la routine</p>
+        <ul>
+          <li>Saisie du jour en moins de 30 secondes</li>
+          <li>Routine de base + jusqu'à 5 habitudes perso</li>
+          <li>Ma semaine&nbsp;: cases de séances, pesée, vidéos, bilan envoyé à Pierre, retour rehab optionnel</li>
+          <li>Mon mois&nbsp;: la case «&nbsp;payer le coach&nbsp;» avec rappel le 25</li>
+          <li>Pas automatiques via Raccourci iPhone (envoi chaque soir à 21h30)</li>
+          <li>Objectifs historisés, gérés par Pierre</li>
+          <li>Journal d'XP, rangs et séries avec joker</li>
+          <li>Profil visuel&nbsp;: calendrier, courbe de pesée</li>
+          <li>Le Dojo&nbsp;: fil partagé, «&nbsp;Respect&nbsp;», objectif commun</li>
+          <li>Rappel push le soir si la journée n'est pas validée</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>V2 · Plus de motivation</h3>
+        <p class="kicker">Ce qui fait revenir chaque jour</p>
+        <ul>
+          <li>Badges&nbsp;: première semaine complète, 30 jours de série, 1 million de pas</li>
+          <li>Objectifs communs à thème (mois de la souplesse, 1 million de pas à plusieurs)</li>
+          <li>Compte à rebours compétition et rappel de catégorie</li>
+          <li>Android&nbsp;: pas via Health Connect (app native légère)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>V3 · La communauté</h3>
+        <p class="kicker">Ce qui fait parler d'ONI</p>
+        <ul>
+          <li>Objectifs communs pour le coaching entreprise (un service, un objectif)</li>
+          <li>Moments du Dojo relayés dans le groupe WhatsApp</li>
+          <li>Bilan de fin de mois en image, à garder ou partager</li>
+          <li>Performances en compétition affichées sur le site</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="questions">
+  <div class="wrap">
+    <h2>À demander à Pierre</h2>
+    <p class="lede">Les réponses changent le modèle. Mieux vaut les avoir avant d'écrire la première ligne de code.</p>
+    <div class="qs">
+      <div class="q"><div><b>L'app remplace-t-elle une partie du Google Sheets&nbsp;?</b><span>Ses athlètes en distanciel saisissent déjà leurs séances dans son template. S'ils doivent tout saisir deux fois, ils lâcheront l'un des deux. À trancher&nbsp;: l'app ne garde que le quotidien (souplesse, pas, calories, eau, forme, une case par séance) et le bilan de la semaine, le Sheets garde la programmation détaillée.</span></div></div>
+      <div class="q"><div><b>Comment l'athlète reçoit-il ses objectifs&nbsp;?</b><span>Sans espace coach, c'est l'athlète qui les saisit. Pierre peut les donner à l'appel de début de cycle&nbsp;: pas par jour, fourchette de calories, eau, séances par semaine.</span></div></div>
+      <div class="q"><div><b>Le barème lui convient-il&nbsp;?</b><span>Notamment la séance cochée (40) face aux calories (20) et à l'eau (10), les pas par tranche de 1&nbsp;000, les vidéos (20) et les 50&nbsp;XP du bilan hebdo.</span></div></div>
+      <div class="q"><div><b>Comment veut-il recevoir les bilans hebdo&nbsp;?</b><span>Un email récapitulatif le dimanche soir, un message WhatsApp par athlète, ou un seul résumé pour tous. Les vidéos restent sur WhatsApp, l'app ne fait que cocher.</span></div></div>
+      <div class="q"><div><b>Qui voit qui dans le Dojo&nbsp;?</b><span>Tous ses athlètes ensemble, ou un Dojo par formule (distanciel, entreprise)&nbsp;? Partage activé par défaut ou au choix de chacun&nbsp;?</span></div></div>
+      <div class="q"><div><b>Quelle routine de base&nbsp;?</b><span>Souplesse, pas, calories, eau, séance, forme chaque jour&nbsp;; séances, pesée, vidéos, bilan chaque semaine&nbsp;; paiement chaque mois. Faut-il en retirer pour certains profils (entreprise, débutants)&nbsp;?</span></div></div>
+      <div class="q"><div><b>Combien d'athlètes sont sur Android&nbsp;?</b><span>Cela décide si Health Connect passe en V1 ou peut attendre.</span></div></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo">ONI<b>.</b></div>
+    <p style="margin-top:8px">Proposition de concept pour l'app ONI Coaching · 12 novembre 2026 · base&nbsp;: la table de suivi quotidien de Matthias, DA du site oni-coaching.fr.</p>
+  </div>
+</footer>

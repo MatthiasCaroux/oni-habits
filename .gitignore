@@ -1,0 +1,10 @@
+# Certificat du proxy de l'entreprise : propre au PC pro, ne pas publier
+corporate-root-ca.pem
+
+# Liens locaux vers les hébergeurs
+app/.vercel/
+app/.netlify/
+.vercel/
+
+node_modules/
+*.log

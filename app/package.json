@@ -1,0 +1,10 @@
+{
+  "name": "oni-habits",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "ONI Habits : PWA de routine pour les athlètes ONI Coaching (sans serveur, données locales).",
+  "scripts": {
+    "start": "node serve.mjs"
+  }
+}
