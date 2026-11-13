@@ -29,17 +29,10 @@ Ces deux valeurs sont publiques, tu peux me les envoyer. **Ne m'envoie jamais la
   - `https://oni-habits.vercel.app/**`
   - `http://localhost:5173/**`
 
-## 4. Le code par e-mail
+## 4. Couper la connexion par e-mail
 
-**Authentication** → **Emails** → **Templates** → **Magic Link**. Remplace le contenu par :
-
-```html
-<h2>Ton code ONI Habits</h2>
-<p>Entre ce code dans l'app : <strong style="font-size:24px">{{ .Token }}</strong></p>
-<p>Il est valable une heure.</p>
-```
-
-Puis **Save**.
+L'app ne propose que Google. **Authentication** → **Sign In / Providers** → **Email** → désactive-le → **Save**.
+Personne ne pourra alors créer de compte autrement que par Google.
 
 ## 5. La connexion Google
 

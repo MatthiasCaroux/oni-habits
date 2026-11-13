@@ -7,13 +7,13 @@ import {
 } from './store.js';
 import { sessionsOfWeek, plannedSessions } from './xp.js';
 import { num, toast } from './ui.js';
-import { accountFirstName, cloud, initCloud, onCloudChange, sendCode, signInGoogle, signOut, syncNow, verifyCode } from './cloud.js';
+import { accountFirstName, cloud, initCloud, onCloudChange, signInGoogle, signOut, syncNow } from './cloud.js';
 import {
   accountView, dayView, habitsView, monthView, onboardingView, profileView, saisieView, socialView, targetsView, weekView
 } from './views.js';
 
 const root = document.getElementById('app');
-const ui = { draftName: '', habitName: '', habitRhythm: 'day', email: '', code: '', codeSent: false, busy: false, skipAccount: false };
+const ui = { draftName: '', habitName: '', habitRhythm: 'day', busy: false, skipAccount: false };
 let installPrompt = null;
 
 // ---------- Routes ----------
@@ -253,25 +253,7 @@ const actions = {
   async 'login-google'() {
     try { await signInGoogle(); } catch (e) { toast('Connexion Google impossible'); }
   },
-  async 'send-code'() {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ui.email)) { toast('Adresse e-mail invalide'); return; }
-    ui.busy = true; render();
-    try { await sendCode(ui.email); ui.codeSent = true; ui.code = ''; toast('Code envoyé'); } catch (e) { toast('Envoi impossible, réessaie'); }
-    ui.busy = false; render();
-  },
-  async 'verify-code'() {
-    if (ui.code.length < 6) { toast('Le code fait 6 chiffres'); return; }
-    ui.busy = true; render();
-    try {
-      await verifyCode(ui.email, ui.code);
-      ui.codeSent = false; ui.code = '';
-      toast('Connecté');
-      go(getState().profile ? '#/profil' : '#/jour');
-    } catch (e) { toast('Code incorrect ou expiré'); }
-    ui.busy = false; render();
-  },
   'skip-account'() { ui.skipAccount = true; render(); },
-  'code-reset'() { ui.codeSent = false; ui.code = ''; render(); },
   'sync-now'() { syncNow(); },
   async logout() {
     if (!window.confirm('Te déconnecter ? Tes données restent sur ce téléphone.')) return;
@@ -328,15 +310,13 @@ const inputs = {
   't-kcalMin'(v) { setTarget('kcalMin', v); },
   't-kcalMax'(v) { setTarget('kcalMax', v); },
   'p-name'(v) { if (v.trim()) update((s) => { s.profile = { ...(s.profile || {}), name: v.trim() }; }); },
-  email(v) { ui.email = v.trim(); },
-  otp(v) { ui.code = v.replace(/\D/g, ''); },
   'coach-name'(v) { update((s) => { s.coachName = v.trim() || 'Pierre'; }); }
 };
 
 // Saisie au fil de l'eau pour les champs « live » (pas de re-rendu), validation à la sortie du champ pour les autres.
 root.addEventListener('input', (e) => {
   const el = e.target;
-  if (el.dataset && el.dataset.input && ['draft-name', 'habit-name', 'email', 'otp'].includes(el.dataset.input)) {
+  if (el.dataset && el.dataset.input && ['draft-name', 'habit-name'].includes(el.dataset.input)) {
     inputs[el.dataset.input](el.value);
   }
 });
@@ -351,7 +331,7 @@ root.addEventListener('change', (e) => {
     return;
   }
   const key = el.dataset && el.dataset.input;
-  if (!key || ['draft-name', 'habit-name', 'email', 'otp'].includes(key)) return;
+  if (!key || ['draft-name', 'habit-name'].includes(key)) return;
   if (inputs[key]) inputs[key](el.value);
 });
 
@@ -374,11 +354,33 @@ window.addEventListener('beforeinstallprompt', (e) => {
 // En local, pas de service worker (sinon on teste une vieille version en cache), sauf avec ?sw.
 const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname) && !location.search.includes('sw');
 if ('serviceWorker' in navigator && location.protocol !== 'file:' && !isLocal) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch((err) => console.warn('Service worker non enregistré', err));
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('./sw.js');
+      // Une app installée reste ouverte en arrière-plan : on regarde s'il y a du neuf
+      // à chaque retour dessus, et toutes les 30 minutes.
+      const check = () => reg.update().catch(() => {});
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+      setInterval(check, 30 * 60 * 1000);
+    } catch (err) {
+      console.warn('Service worker non enregistré', err);
+    }
   });
+  // La nouvelle version a pris la main : on propose de recharger (pas au tout premier lancement).
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) showUpdateBar(); });
 }
 
+function showUpdateBar() {
+  if (document.getElementById('update-bar')) return;
+  const bar = document.createElement('button');
+  bar.type = 'button';
+  bar.id = 'update-bar';
+  bar.className = 'update-bar';
+  bar.innerHTML = '<span>Nouvelle version disponible</span><b>Mettre à jour</b>';
+  bar.addEventListener('click', () => location.reload());
+  document.body.appendChild(bar);
+}
 // Au retour sur l'app après minuit, on repasse sur la bonne journée.
 let lastDay = ymd(today());
 document.addEventListener('visibilitychange', () => {

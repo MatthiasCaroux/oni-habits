@@ -149,18 +149,6 @@ export async function signInGoogle() {
   if (error) throw error;
 }
 
-export async function sendCode(email) {
-  const c = await client();
-  const { error } = await c.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: `${location.origin}/` } });
-  if (error) throw error;
-}
-
-export async function verifyCode(email, token) {
-  const c = await client();
-  const { error } = await c.auth.verifyOtp({ email, token, type: 'email' });
-  if (error) throw error;
-}
-
 export async function signOut() {
   const c = await client();
   await push().catch(() => {});

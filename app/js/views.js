@@ -40,7 +40,6 @@ function accountBlock() {
       <div class="sec-h"><h2>Sauvegarde en ligne</h2></div>
       <p class="hint">Connecte-toi pour retrouver tes données sur n'importe quel téléphone.</p>
       <button type="button" class="btn google" data-act="login-google">${GOOGLE_G} Continuer avec Google</button>
-      <a class="btn ghost" href="#/compte">Recevoir un code par e-mail</a>
     </section>`;
 }
 
@@ -60,24 +59,10 @@ export function accountView(ui) {
     <main class="main">${loginBlock(ui)}</main>`;
 }
 
-// Google ou code par e-mail. Le compte est créé à la première connexion :
+// Connexion Google uniquement. Le compte est créé à la première connexion :
 // « s'inscrire » et « se connecter » sont le même geste.
 function loginBlock(ui) {
-  return `<button type="button" class="btn google" data-act="login-google"${ui.busy ? ' disabled' : ''}>${GOOGLE_G} Continuer avec Google</button>
-      <div class="or"><span>ou par e-mail</span></div>
-      <section class="card form">
-        ${ui.codeSent ? `
-          <p class="hint">Code envoyé à <b>${esc(ui.email)}</b>. Regarde tes mails (et les indésirables).</p>
-          <label class="lab" for="otp">Code à 6 chiffres</label>
-          <input id="otp" class="input big center" inputmode="numeric" autocomplete="one-time-code" maxlength="6" data-input="otp" data-live="1" value="${esc(ui.code)}" placeholder="••••••">
-          <button type="button" class="btn" data-act="verify-code"${ui.busy ? ' disabled' : ''}>Valider</button>
-          <button type="button" class="btn ghost" data-act="code-reset">Changer d'adresse</button>`
-        : `
-          <label class="lab" for="email">Ton adresse e-mail</label>
-          <input id="email" class="input" type="email" inputmode="email" autocomplete="email" data-input="email" data-live="1" value="${esc(ui.email)}" placeholder="toi@exemple.fr">
-          <button type="button" class="btn" data-act="send-code"${ui.busy ? ' disabled' : ''}>Recevoir mon code</button>`}
-      </section>
-      <p class="hint center">Sur iPhone, si Google te renvoie vers Safari au lieu de l'app, utilise le code par e-mail.</p>`;
+  return `<button type="button" class="btn google" data-act="login-google"${ui.busy ? ' disabled' : ''}>${GOOGLE_G} Continuer avec Google</button>`;
 }
 
 const ZONES = ['Épaule', 'Coude', 'Poignet', 'Dos', 'Hanche', 'Genou', 'Cheville'];

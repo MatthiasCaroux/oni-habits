@@ -1,6 +1,6 @@
 // Service worker ONI Habits : l'app marche hors ligne.
 // Pense à changer VERSION à chaque mise en ligne pour que les téléphones récupèrent la nouvelle version.
-const VERSION = 'oni-habits-v7';
+const VERSION = 'oni-habits-v9';
 const FONTS = 'oni-habits-fonts';
 const ASSETS = [
   './',
@@ -23,7 +23,10 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // cache: 'reload' : on prend les fichiers sur le serveur, pas dans le cache du navigateur.
+  event.waitUntil(caches.open(VERSION)
+    .then((c) => c.addAll(ASSETS.map((a) => new Request(a, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {
